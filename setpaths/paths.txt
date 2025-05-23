@@ -1,0 +1,4 @@
+libpath = ../Unrolled-DOT-files/libpath
+datpath = ../Unrolled-DOT-files/datapath
+resultpath = ../Unrolled-DOT-files/results
+basepath = ../Unrolled-DOT-files

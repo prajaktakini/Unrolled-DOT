@@ -4,19 +4,68 @@ import numpy as np
 
      
 class LISTA(nn.Module):
+    """
+        Learned ISTA (LISTA) Network.
+
+        This model unrolls the Iterative Shrinkage-Thresholding Algorithm (ISTA) for sparse signal recovery
+        into a trainable neural network with `numLayers` layers. Each layer mimics an ISTA iteration and
+        optionally learns its own parameters.
+
+        Parameters:
+        -----------
+        numLayers : int
+            Number of LISTA layers to unroll (equivalent to ISTA iterations).
+
+        szA : tuple
+            Shape of the dictionary matrix A as (rows, cols). Only used if A is not provided.
+
+        scale_mag : float
+            Initial scale factor used when initializing weights (or for computing preset W/S if A is provided).
+
+        actfunc : str, optional (default="shrink")
+            Activation function to use per layer.
+            Options:
+                - "shrink": soft thresholding (default, L1-based sparsity)
+                - "swish": SiLU activation
+                - "tanh" : Hyperbolic tangent
+
+        A : np.ndarray or None, optional (default=None)
+            Fixed dictionary matrix A (size: rows × cols). If None, A is initialized randomly.
+
+        untied : bool, optional (default=False)
+            If True, each LISTA layer will have its own learnable S matrix and λ parameter.
+            If False, all layers share the same S and λ (tied weights).
+
+        untrained_lamL1 : float or None, optional (default=None)
+            If provided, sets λ to a fixed scalar value (not learned).
+            If None, λ is learned during training.
+
+        Attributes:
+        -----------
+        W : torch.nn.Parameter
+            Weight matrix equivalent to γ·Aᵗ (shared or fixed).
+
+        S : torch.nn.Parameter or list of Parameters
+            Matrix controlling the recursive residual update per layer.
+            If `untied`, this is a list of Parameters (one per layer).
+
+        lam : torch.nn.Parameter or list of Parameters
+            Shrinkage threshold(s). Can be fixed or learned.
+   """
+
     def __init__(self, numLayers, szA, scale_mag, actfunc="shrink", untrained_lamL1=None, untied=False, A=None):
         super().__init__()
         
-        if A is None:
+        if A is None: # (size0, size1)
             self.szA_0, self.szA_1 = szA
             self.predefined_A = False
         else:
             self.szA_0, self.szA_1 = A.shape
             AT = A.T
-            ATA = AT@A
+            ATA = AT@A  # (size1, size0) * (size0, size1) => (size1, size1)
             stp = scale_mag
-            self.preset_W = (1/stp) * AT
-            self.preset_S = np.eye(self.szA_1) - ((1/stp) * (AT@A))
+            self.preset_W = (1/stp) * AT # (size1, size0)
+            self.preset_S = np.eye(self.szA_1) - ((1/stp) * (AT@A))  # (size1, size1)
             self.predefined_A = True
             
         self.NL = numLayers
@@ -52,8 +101,8 @@ class LISTA(nn.Module):
             W_np = self.preset_W
             S_np = self.preset_S
         else:
-            W_np = self.scale_mag * np.random.rand(self.szA_1, self.szA_0)
-            S_np = self.scale_mag * np.random.rand(self.szA_1, self.szA_1)
+            W_np = self.scale_mag * np.random.rand(self.szA_1, self.szA_0)   # (size1, size0)
+            S_np = self.scale_mag * np.random.rand(self.szA_1, self.szA_1)   # (size1, size1)
         lam_np = self.scale_mag * np.random.rand(1,1)
         
         W = nn.Parameter(torch.tensor(W_np, dtype=torch.double))
@@ -68,6 +117,7 @@ class LISTA(nn.Module):
         
     def applyActFunc(self, x, L=None):
         if self.actfunc == "shrink":
+            # \text{shrink}(x, \lambda) = \text{sign}(x) \cdot \max(|x| - \lambda, 0)
             if self.untied:
                 return torch.sign(x) * torch.clamp(torch.abs(x) - self.lam[L], min=0)
             else:
@@ -80,6 +130,8 @@ class LISTA(nn.Module):
             raise ValueError('Incorrect activation function set')
         
     def forward(self, Y):
+        # Each ISTA iteration can be written as:
+        # x_{k+1} = W y + S \cdot \text{shrink}(x_k)
         if (self.untied):
             Wy = self.W @ Y 
             Z = Wy 

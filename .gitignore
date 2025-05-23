@@ -4,4 +4,18 @@
 *.mat
 *.asv
 *.m~
-setpaths/paths.txt
+
+# macOS system file
+.DS_Store
+
+# IDE settings (e.g., PyCharm)
+.idea/
+
+# Version files or loose scripts
+=1.26
+=1.9
+=3.8
+dot_env/
+Unrolled-DOT-files/
+
+

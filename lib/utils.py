@@ -1,11 +1,11 @@
 import time
 
 import numpy as np
-from lib.LISTA_class import LISTA
-from lib.FC_Conv import FC_Conv
-from lib.vgg_loss import VGG_Loss
-from lib.unet_flexible import UNet_wrapper
-from lib.DOTDataset_class import DOTDataset
+from LISTA_class import LISTA
+from FC_Conv import FC_Conv
+from vgg_loss import VGG_Loss
+from unet_flexible import UNet_wrapper
+from DOTDataset_class import DOTDataset
 
 import matplotlib.pyplot as plt
 from scipy.io import loadmat, savemat
@@ -132,6 +132,7 @@ def train_model(dataset_in, train_d, dev, A=None, visInds=[],
     
     itr_start = time.perf_counter()
     for n in range(nEpochs):
+        print(f"Epoch: {n}")
         for i_batch, samples_batch in enumerate(train_dataloader):
             
             Y_torch, X_torch = samples_batch
@@ -152,6 +153,7 @@ def train_model(dataset_in, train_d, dev, A=None, visInds=[],
             else:
                 vgg_loss_curr = 0
             loss = loss_fn(X_torch, X_pred) + vgg_loss_curr
+            print("loss " + loss.item())
 
             # Test current model on test data
             if (n % showEvery == 0 or n == nEpochs - 1) and (i_batch == len(train_dataloader) - 1):
