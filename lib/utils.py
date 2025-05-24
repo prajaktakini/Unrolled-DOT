@@ -173,7 +173,7 @@ def train_model(dataset_in, train_d, dev, A=None, visInds=[],
             else:
                 vgg_loss_curr = 0
             loss = loss_fn(X_torch, X_pred) + vgg_loss_curr
-            print("loss " + loss.item())
+            print(f"loss {loss.item()}")
 
             # Test current model on test data
             if (n % showEvery == 0 or n == nEpochs - 1) and (i_batch == len(train_dataloader) - 1):

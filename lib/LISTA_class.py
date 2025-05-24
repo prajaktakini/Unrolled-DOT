@@ -117,14 +117,14 @@ class LISTA(nn.Module):
             S_np = self.preset_S
         else:
             print("Init vars 2")
-            # W_np = self.scale_mag * np.random.rand(self.szA_1, self.szA_0)
-            # S_np = self.scale_mag * np.random.rand(self.szA_1, self.szA_1)
-            W_torch = self.scale_mag * torch.rand((self.szA_1, self.szA_0), device='cuda')
-            S_torch = self.scale_mag * torch.rand((self.szA_1, self.szA_1), device='cuda')
-
-            # Optional: convert back to NumPy if needed
-            W_np = W_torch.cpu().numpy()
-            S_np = S_torch.cpu().numpy()
+            W_np = self.scale_mag * np.random.rand(self.szA_1, self.szA_0).astype(np.float32)
+            S_np = self.scale_mag * np.random.rand(self.szA_1, self.szA_1).astype(np.float32)
+            # W_torch = self.scale_mag * torch.rand((self.szA_1, self.szA_0), device='cuda')
+            # S_torch = self.scale_mag * torch.rand((self.szA_1, self.szA_1), device='cuda')
+            #
+            # # Optional: convert back to NumPy if needed
+            # W_np = W_torch.cpu().numpy()
+            # S_np = S_torch.cpu().numpy()
         print("Init vars 3")
         lam_np = self.scale_mag * np.random.rand(1, 1)
 
