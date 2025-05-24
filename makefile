@@ -1,11 +1,11 @@
-.PHONY: all create-env install-deps activate-note
+.PHONY: all create-env install-deps activate-note init-conda-shell
 
 ENV_NAME := unrolled-dot-env
 PYTHON_VERSION := 3.10
 CONDA_DIR := $(HOME)/miniconda3
 CONDA_BIN := $(CONDA_DIR)/bin/conda
 
-all: create-env install-deps activate-note
+all: create-env init-conda-shell install-deps activate-note
 
 # Step 1: Install Miniconda if not present
 $(CONDA_BIN):
@@ -25,12 +25,20 @@ create-env: $(CONDA_BIN)
 		$(CONDA_BIN) create -y -n $(ENV_NAME) python=$(PYTHON_VERSION); \
 	fi
 
-# Step 3: Install GPU-supported dependencies via Conda (torch w/ CUDA 12.1)
+# Step 3: Initialize Conda shell integration
+init-conda-shell:
+	@echo "🔧 Initializing Conda shell support..."
+	@$(CONDA_BIN) init bash
+	@echo "🔄 Sourcing ~/.bashrc to enable 'conda' command..."
+	@bash -c "source ~/.bashrc && echo '✅ Conda shell initialized.'"
+
+# Step 4: Install GPU-supported dependencies
+# Step 4: Install GPU-supported dependencies
 install-deps:
-	@echo "📦 Installing Python dependencies into '$(ENV_NAME)'..."
+	@echo "📦 Installing Python and GPU dependencies into '$(ENV_NAME)'..."
 	@$(CONDA_BIN) install -n $(ENV_NAME) -y \
 		pytorch torchvision torchaudio pytorch-cuda=12.1 -c pytorch -c nvidia
-	@$(CONDA_BIN) run -n $(ENV_NAME) pip install \
+	@$(CONDA_BIN) run --no-capture-output -n $(ENV_NAME) pip install \
 		numpy>=1.26 matplotlib>=3.8 kornia==0.5.11 \
 		parse scipy scikit-image h5py jupyterlab huggingface_hub ipywidgets
 

@@ -1,8 +1,16 @@
 #!/bin/bash
-# ssh -i ~/.ssh/lambda-key.pem ubuntu@132.145.192.157
+# ssh -i ~/.ssh/lambda-key.pem ubuntu@150.136.130.35
+
+#git clone https://github.com/your-username/Unrolled-DOT.git
+#cd Unrolled-DOT
+#
+## Optional: create folders if not present (safety)
+#mkdir -p Unrolled-DOT-files/datapath
+#mkdir -p Unrolled-DOT-files/libpath
+#mkdir -p Unrolled-DOT-files/results
 # === CONFIGURE THESE ===
 PEM_FILE=~/.ssh/lambda-key.pem                          # Your private key
-INSTANCE_IP=132.145.192.157                    # Lambda Labs instance IP
+INSTANCE_IP=150.136.44.60                  # Lambda Labs instance IP
 REMOTE_USER=ubuntu
 LOCAL_PROJECT_PATH=/Users/prajakta/mscs_fall2024/sem1/Unrolled-DOT
 REMOTE_PROJECT_ROOT=~/Unrolled-DOT                      # Base folder on Lambda
