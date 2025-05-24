@@ -1,7 +1,7 @@
 #!/bin/bash
-# ssh -i ~/.ssh/lambda-key.pem ubuntu@150.136.130.35
+# ssh -i ~/.ssh/lambda-key.pem ubuntu@129.146.36.52
 
-#git clone https://github.com/your-username/Unrolled-DOT.git
+#git clone https://github.com/prajaktakini/Unrolled-DOT.git
 #cd Unrolled-DOT
 #
 ## Optional: create folders if not present (safety)
