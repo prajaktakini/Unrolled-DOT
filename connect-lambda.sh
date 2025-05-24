@@ -1,5 +1,5 @@
 #!/bin/bash
-# ssh -i ~/.ssh/lambda-key.pem ubuntu@129.146.36.52
+# ssh -i ~/.ssh/lambda-key.pem ubuntu@104.171.202.139
 
 #git clone https://github.com/prajaktakini/Unrolled-DOT.git
 #cd Unrolled-DOT

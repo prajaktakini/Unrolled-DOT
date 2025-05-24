@@ -88,8 +88,6 @@ def train_model(dataset_in, train_d, dev, A=None, visInds=[],
     else:
         unet_nfilts = 0
 
-    print("Here 1")
-
     szA, _, _, imY, imX = dataset_in.getDims()
 
     # Initialize training variables: model, loss(es), optimizer
@@ -102,15 +100,12 @@ def train_model(dataset_in, train_d, dev, A=None, visInds=[],
     else:
         raise AssertionError("Invalid loss function")
 
-    print("Here 2")
 
     if model == None:
         model = LISTA(numLayers=nLayers, szA=szA, scale_mag=scale_mag, actfunc=actfunc, untrained_lamL1=lam1,
                       untied=untied, A=A)
-        print("Here 3")
         model.to(dev)
 
-    print("Here 4")
     if vgg_weight > 0:
         vgg_loss_fn = VGG_Loss(imSz=imY, loss_fn=loss_fn)
         vgg_loss_fn.send2dev(dev)
@@ -126,7 +121,6 @@ def train_model(dataset_in, train_d, dev, A=None, visInds=[],
     else:
         optimizer = optim
 
-    print("Here 5")
     epoch_arr = np.array([])
     train_losses = np.array([])
     test_losses = np.array([])
@@ -134,10 +128,8 @@ def train_model(dataset_in, train_d, dev, A=None, visInds=[],
     runtime_arr = np.array([])
     misc = {}
 
-    print("Here 6")
     train_dataloader = DataLoader(dataset_in, batch_size=batch_sz, shuffle=True)
     trainMeas, trainTruth = dataset_in.getFullTrainSet()
-    print("Here 7")
     testMeas, testTruth = dataset_in.getFullTestSet()
 
     print("Loaded full train and test data")
@@ -150,10 +142,7 @@ def train_model(dataset_in, train_d, dev, A=None, visInds=[],
 
     itr_start = time.perf_counter()
     for n in range(nEpochs):
-        print(f"Epoch: {n}")
         for i_batch, samples_batch in enumerate(train_dataloader):
-
-            print("training batch started")
 
             Y_torch, X_torch = samples_batch
             Y_torch = Y_torch.T.to(dev)
@@ -173,7 +162,6 @@ def train_model(dataset_in, train_d, dev, A=None, visInds=[],
             else:
                 vgg_loss_curr = 0
             loss = loss_fn(X_torch, X_pred) + vgg_loss_curr
-            print(f"loss {loss.item()}")
 
             # Test current model on test data
             if (n % showEvery == 0 or n == nEpochs - 1) and (i_batch == len(train_dataloader) - 1):
