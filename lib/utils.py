@@ -171,6 +171,7 @@ def train_model(dataset_in, train_d, dev, A=None, visInds=[],
                     X_pred_test = model(Y_test_torch)
                     if unet_nfilts > 0:
                         X_pred_test = unet(X_pred_test)
+                    X_pred_test = torch.clamp(X_pred_test, 0.0, 1.0)
                     loss_test = loss_fn(X_test_torch, X_pred_test)
 
             # Backpropagate
@@ -192,6 +193,8 @@ def train_model(dataset_in, train_d, dev, A=None, visInds=[],
                 runtime_arr = np.append(runtime_arr, itr_time)
 
                 if len(visInds) > 0:
+                    X_pred_clipped = torch.clamp(X_pred, 0.0, 1.0)  # 🔥 Clip before visualizing
+                    X_pred_test_clipped = torch.clamp(X_pred_test, 0.0, 1.0)
                     predIms_train = np.reshape(X_pred.cpu().detach().numpy()[:, visInds], (imY, imX, -1))
                     predIms_test = np.reshape(X_pred_test.cpu().detach().numpy()[:, visInds], (imY, imX, -1))
                     predIms = np.concatenate((predIms_train, predIms_test), axis=2)
